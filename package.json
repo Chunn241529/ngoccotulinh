@@ -6,7 +6,9 @@
   "scripts": {
     "build": "esbuild src/app.js --bundle --minify --format=iife --target=es2020 --outfile=vendor/bundle.js",
     "watch": "esbuild src/app.js --bundle --format=iife --sourcemap --target=es2020 --outfile=vendor/bundle.js --watch",
-    "start": "node server.js"
+    "start": "node server.js",
+    "data": "node build-data.mjs",
+    "deploy": "node build-data.mjs && npm run build"
   },
   "devDependencies": {
     "esbuild": "^0.24.0",

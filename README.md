@@ -117,3 +117,23 @@ Thả ảnh mới vào thư mục là token mới xuất hiện ở màn 3; sử
 
 Trang có 3 màn theo cuộn: giới thiệu (0) → bộ bài (1) → token (2). `body{height:300vh}`.
 Khung hẹp thì token tự xếp thành 2 hàng (`tokenCols()`), không thu nhỏ tới mức không đọc được.
+
+## Deploy GitHub Pages
+
+Trang tĩnh: https://chunn241529.github.io/ngoccotulinh/
+
+Pages không chạy được `server.js`, nên bản deploy đọc danh sách từ `data.json` (sinh sẵn).
+App thử `api/cards` trước, 404 thì rơi xuống `data.json`, nên cùng một bundle chạy được cả
+`npm start` (có API) lẫn Pages (tĩnh).
+
+Sau khi thêm/sửa ảnh, tên lá trong `titles.json`, hay `token/tokens.json`:
+
+```bash
+npm run deploy      # = node build-data.mjs + npm run build
+git add -A && git commit -m "update cards" && git push
+```
+
+Pages tự build lại sau ~1 phút. Không cần Actions.
+
+QR vào trang: `qr.png` (656×656) và `qr.svg`, trỏ tới
+`https://chunn241529.github.io/ngoccotulinh/`.
