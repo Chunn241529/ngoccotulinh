@@ -59,7 +59,14 @@ const state = {
   fitScale: 1, focusScale: 1.2, stepScale: 1, stage: 0, stage2: 0,
   tokens: [], gem: null, allTokens: [], hoverToken: null, tokScale: 1,
   pointerRaw: new THREE.Vector2(),
+  heroOy: 0, focusY: 0.16, focusX: -0.06, tokY: 0, unit: 0, heroK: 0.86, tokMinY: 0,
 };
+const tmpProj = new THREE.Vector3();
+const canHover = matchMedia('(hover: hover)').matches;
+const TOKEN_HINT = canHover
+  ? 'Đưa chuột lên một token để đọc công dụng.'
+  : 'Chạm một token để đọc công dụng.';
+
 
 /* ------------------------------------------------------------------ data */
 
@@ -556,10 +563,31 @@ function fitTokens() {
   const n = Math.max(1, state.tokens.length);
   const cols = tokenCols();
   const rows = Math.ceil(n / cols);
-  const spanX = (cols - 1) * TOK.step + 1.0;
-  const spanY = (rows - 1) * TOK.step * 0.94 + 2.5;
+  // khối token trong hệ chưa nhân tỉ lệ: hàng dưới cùng tới viên ngọc trên cùng
+  let minY = TOK.rowY - (rows - 1) * TOK.step * 0.94 - 0.47;
+  let maxY = TOK.rowY + 0.47;
+  if (state.gem) maxY = Math.max(maxY, TOK.rowY + 1.28 + 0.62);
+  const spanX = (cols - 1) * TOK.step + 0.94;
+  const spanY = maxY - minY;
   const vw = state.vw || 5.6, vh = state.vh || 3.5;
-  state.tokScale = Math.min(1, (vw * 0.9) / spanX, (vh * 0.9) / spanY);
+  // chừa dải caption ở đáy khung, nếu không hàng token dưới cùng nằm lên chữ
+  const cap = document.getElementById('tok');
+  const capPx = (cap ? cap.offsetHeight : 0) + 34 + 16;
+  const usable = Math.max(0.4, (innerHeight - capPx) / innerHeight);
+  state.tokScale = Math.min(1, (vw * 0.98) / spanX, (vh * 0.92 * usable) / spanY);
+  state.tokMinY = minY;
+  placeTokens(minY);
+}
+
+// caption cao lên khi chọn token (thêm dòng công dụng) nên phải nâng hàng token
+// theo chiều cao thật của nó; gọi lại mỗi lần nội dung caption đổi.
+function placeTokens(minY) {
+  if (!state.tokens.length) return;
+  const vh = state.vh || 3.5;
+  const cap = document.getElementById('tok');
+  const capPx = (cap ? cap.offsetHeight : 0) + 34 + 16;
+  const capTopW = (capPx - innerHeight / 2) * (vh / innerHeight);
+  state.tokY = Math.max(0, capTopW - minY * state.tokScale + 0.03 * vh);
 }
 
 // vị trí của token thứ i (đã nhân tỉ lệ), gốc ở tâm hàng trên
@@ -602,16 +630,78 @@ function fitRoot() {
 
   state.stepScale = 1;
   let { hx, hy } = half();
-  if (hx > W) { state.stepScale = Math.max(0.42, W / hx); ({ hx, hy } = half()); }
+  // 0.52 is the tightest step that still keeps neighbours out of each other's
+  // slab; below it the z stagger cannot make up for the smaller arc, and cards clip.
+  if (hx > W) { state.stepScale = Math.max(0.52, W / hx); ({ hx, hy } = half()); }
 
   state.fitScale = Math.min(1.25, W / hx, (vh * 0.45) / hy);
 
-  // focused card: 80% of frame height (or 72% width), never a hand-tuned constant
-  const df = CAM_FOCUS.z - FOCUS_Z;
-  const fvh = 2 * df * Math.tan(THREE.MathUtils.degToRad(FOV / 2));
+  // focused card: 80% of frame height (or 72% width), never a hand-tuned constant.
+  // On a phone sheet the usable height stops at the panel's top edge, and the card
+  // is centred in what is left instead of the whole frame.
+  camera.updateMatrixWorld();
+  const fvh0 = 2 * (CAM_FOCUS.z - FOCUS_Z) * Math.tan(THREE.MathUtils.degToRad(FOV / 2));
+  const fvh = 2 * (CAM_FOCUS.z - state.fitScale * FOCUS_Z) * Math.tan(THREE.MathUtils.degToRad(FOV / 2));
   const fvw = fvh * camera.aspect;
-  state.focusScale = Math.min(1.3, (fvh * 0.78) / CARD_H, (fvw * 0.68) / CARD_W);
+  const fvw0 = fvh0 * camera.aspect;
+  const infoEl = document.getElementById('info');
+  let bandBottom = innerHeight;
+  if (infoEl) {
+    const r = infoEl.getBoundingClientRect();
+    if (r.width > innerWidth * 0.55) bandBottom = Math.min(innerHeight - 16, r.top);
+  }
+  const sheet = bandBottom < innerHeight - 16;
+  const freeH = Math.max(0.30 * innerHeight, bandBottom - 20);
+  state.focusScale = sheet
+    ? Math.min(1.3, (fvh * 0.92 * freeH) / (innerHeight * CARD_H), (fvw * 0.68) / CARD_W)
+    : Math.min(1.3, (fvh0 * 0.78) / CARD_H, (fvw0 * 0.68) / CARD_W);
+  if (sheet) {
+    // solve the card's world y so its centre lands in the middle of the free band
+    const want = (20 + bandBottom) / 2;
+    state.focusY = camProbe(CAM_FOCUS, LOOK_FOCUS, () => {
+      const sy = (fy) => {
+        tmpProj.set(0, state.fitScale * fy, state.fitScale * FOCUS_Z).project(camera);
+        return (-tmpProj.y * 0.5 + 0.5) * innerHeight;
+      };
+      let fy = 0.16;
+      for (let k = 0; k < 4; k++) {
+        const slope = (sy(fy) - sy(fy + 0.1)) / 0.1 || 1;
+        fy += (sy(fy) - want) / slope;
+      }
+      return fy;
+    });
+    state.focusX = 0;        // sheet ở đáy: không cần né cột chữ bên phải
+  } else {
+    state.focusY = 0.16;     // desktop framing stays exactly as approved
+    state.focusX = -0.06;
+  }
+
+  state.heroOy = heroOffset();
   fitTokens();
+}
+
+// project a probe point through a camera pose without disturbing the live camera
+function camProbe(pos, look, fn) {
+  const p = camera.position.clone(), q = camera.quaternion.clone();
+  camera.position.copy(pos);
+  camera.lookAt(look);
+  camera.updateMatrixWorld();
+  try { return fn(); } finally {
+    camera.position.copy(p);
+    camera.quaternion.copy(q);
+    camera.updateMatrixWorld();
+  }
+}
+
+// Portrait: the hero copy owns the top of the screen, so the hand of cards is
+// placed just under it instead of at the frame centre. Measured, not hand-tuned:
+// the copy height changes with font size and phone width.
+function heroOffset() {
+  state.heroK = 0.86;
+  if (camera.aspect >= 1.05) return 0;
+  // điện thoại dọc: màn đầu chỉ có chữ. Bài nằm hẳn dưới mép dưới, cuộn hoặc
+  // bấm nút thì trồi lên rồi mở quạt (stage damping lo phần animation).
+  return -((state.vh || 3.5) / 2) - 1.5;
 }
 
 function layoutTargets(c, i) {
@@ -635,7 +725,7 @@ function layoutTargets(c, i) {
   let scale = spec.scale, dim = 0;
 
   if (state.focusIdx === i) {
-    pos.set(-0.06, 0.16, FOCUS_Z);
+    pos.set(state.focusX, state.focusY, FOCUS_Z);
     rot.set(0, 0, 0);
     scale = state.focusScale / (FAN_ROOT.scale.x || 1);
   } else if (state.focusIdx !== null) {
@@ -690,6 +780,7 @@ async function boot() {
 
   await spawnClouds(extras?.clouds);
   await spawnTokens(extras?.tokens, extras?.tokenInfo);
+  fitTokens();          // lần đầu chạy khi chưa có token, phải fit lại sau khi nạp
 
   // post
   const dpr = Math.min(devicePixelRatio, 2);
@@ -707,6 +798,7 @@ async function boot() {
   composer.addPass(grade);
 
   state.ready = true;
+  state.unit = document.body.scrollHeight / 3;   // 300vh / 3, ổn định khi thanh địa chỉ thu lại
   window.ARCA = { THREE, scene, camera, renderer, state, cards: state.cards, composer, bloom, grade };
   document.getElementById('loading')?.classList.add('gone');
   updateHud();
@@ -726,7 +818,7 @@ function updateHud() {
   if (now) now.textContent = String((state.focusIdx ?? 0) + 1).padStart(2, '0');
   const all = document.getElementById('idx-all');
   if (all) all.textContent = '/ ' + n;
-  if (!has || !panel) { panel?.classList.remove('on'); return; }
+  if (!has || !panel) { panel?.classList.remove('on'); fitRoot(); return; }
   const d = state.cards[state.focusIdx].data;
   const kind = panel.querySelector('.kind');
   const KIND = { 'nhân vật': 'Lá Nghề', item: 'Lá Hành Động', 'nhiệm vụ': 'Lá Kiếp Nạn', 'biểu quyết': 'Lá Biểu Quyết' };
@@ -746,6 +838,7 @@ function updateHud() {
     const s = document.createElement('span'); s.textContent = t; tags.appendChild(s);
   }
   panel.classList.add('on');
+  fitRoot();   // chiều cao panel đổi theo nội dung: khung soi lá phải tính lại
 }
 
 /* ----------------------------------------------------------- token caption */
@@ -766,13 +859,15 @@ function setTokenCaption(i) {
   const tk = i === null || i === undefined ? null : state.allTokens[i];
   if (!tk) {
     tokName.textContent = 'Token đánh dấu';
-    tokRule.textContent = 'Đưa chuột lên một token để đọc công dụng.';
+    tokRule.textContent = TOKEN_HINT;
     tokEl?.classList.remove('sel');
+    placeTokens(state.tokMinY);
     return;
   }
   tokName.textContent = tk.data.name;
   tokRule.textContent = tk.data.rule;
   tokEl?.classList.add('sel');
+  placeTokens(state.tokMinY);
 }
 
 /* ------------------------------------------------------------- interaction */
@@ -780,7 +875,7 @@ function setTokenCaption(i) {
 const heroEl = document.getElementById('hero');
 const hudEl = document.querySelector('.hud');
 document.getElementById('cta')?.addEventListener('click', () => {
-  scrollTo({ top: innerHeight, behavior: 'smooth' });
+  scrollTo({ top: state.unit || innerHeight, behavior: 'smooth' });
 });
 
 const ray = new THREE.Raycaster();
@@ -823,13 +918,30 @@ addEventListener('pointermove', (e) => {
   }
 }, { passive: true });
 
-addEventListener('pointerdown', () => {
-  if (!state.ready || state.stage < 0.6 || state.stage2 > 0.35) return;
+// chạm (hoặc bấm chuột) mới đổi trạng thái: vuốt để cuộn trang không được kích hoạt
+let tapStart = null;
+addEventListener('pointerdown', (e) => {
+  state.pointerRaw.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
+  tapStart = { x: e.clientX, y: e.clientY, t: performance.now() };
+}, { passive: true });
+
+addEventListener('pointerup', (e) => {
+  const s = tapStart;
+  tapStart = null;
+  if (!s || !state.ready) return;
+  if (Math.hypot(e.clientX - s.x, e.clientY - s.y) > 10 || performance.now() - s.t > 600) return;
+  state.pointerRaw.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
+  if (state.stage2 > 0.35) {
+    // màn token: điện thoại không có hover, chạm để đọc công dụng
+    state.hoverToken = pickToken();
+    setTokenCaption(state.hoverToken);
+    return;
+  }
+  if (state.stage < 0.6) return;
   const h = pick();
-  if (h === null) { state.focusIdx = null; }
-  else state.focusIdx = state.focusIdx === h ? null : h;
+  state.focusIdx = h === null ? null : (state.focusIdx === h ? null : h);
   updateHud();
-});
+}, { passive: true });
 
 addEventListener('keydown', (e) => {
   if (!state.ready || state.stage < 0.6 || state.stage2 > 0.35) return;
@@ -849,6 +961,7 @@ addEventListener('resize', () => {
   composer?.setSize(innerWidth, innerHeight);
   bloom?.setSize(innerWidth, innerHeight);
   renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  state.unit = document.body.scrollHeight / 3;
   fitRoot();
 });
 
@@ -879,7 +992,7 @@ function animate() {
   camera.lookAt(camLook);
 
   // scroll stage: hero (0) → showcase cards (1) → token row (2)
-  const rawStage = Math.min(2, Math.max(0, scrollY / Math.max(1, innerHeight)));
+  const rawStage = Math.min(2, Math.max(0, scrollY / (state.unit || innerHeight)));
   state.stage = damp(state.stage, rawStage, 6.5, dt);
   state.stage2 = Math.min(1, Math.max(0, state.stage - 1));
   const st = Math.min(1, state.stage);
@@ -890,14 +1003,14 @@ function animate() {
     document.body.style.cursor = 'default';
   }
 
-  FAN_ROOT.scale.setScalar(damp(FAN_ROOT.scale.x, state.fitScale * (0.86 + 0.14 * st), 3.2, dt));
+  FAN_ROOT.scale.setScalar(damp(FAN_ROOT.scale.x, state.fitScale * (state.heroK * (1 - st) + st), 3.2, dt));
   // hero offset measured in frame units so it adapts to any aspect:
   // wide → cards sit up-right of the copy; portrait → copy on top, cards below it
   const narrow = camera.aspect < 1.05;
   const ox = narrow ? 0 : (state.vw || 5.6) * 0.186;
-  const oy = narrow ? -(state.vh || 3.5) * 0.17 : 0;   // wide: keep the fan vertically centred
+  const oy = narrow ? state.heroOy : 0;   // portrait: hand sits under the copy, measured in fitRoot
   // màn thẻ: quạt lệch 15px sang trái tâm khung, bù lại
-  FAN_ROOT.position.x = damp(FAN_ROOT.position.x, ox * Math.pow(1 - st, 1.8) + 0.07 * st, 3.4, dt);
+  FAN_ROOT.position.x = damp(FAN_ROOT.position.x, ox * Math.pow(1 - st, 1.8) + (narrow ? 0 : 0.07) * st, 3.4, dt);
   // +0.075 ở màn thẻ: quạt đo được lệch 14px xuống dưới tâm khung
   FAN_ROOT.position.y = damp(FAN_ROOT.position.y, oy * (1 - st) + 0.075 * st, 3.4, dt);
   FAN_ROOT.position.z = damp(FAN_ROOT.position.z, -0.35 * (1 - st), 3.4, dt);
@@ -973,7 +1086,7 @@ function animate() {
     const ease = ex * ex * (3 - 2 * ex);
     TOKEN_ROOT.visible = ex > 0.002;
     // khung dọc: nhấc cả cụm lên để không đè caption ở đáy
-    TOKEN_ROOT.position.y = damp(TOKEN_ROOT.position.y, camera.aspect < 1.05 ? 0.36 : 0, 4, dt);
+    TOKEN_ROOT.position.y = damp(TOKEN_ROOT.position.y, state.tokY, 4, dt);
     if (ex < 0.35 && state.hoverToken !== null) { state.hoverToken = null; setTokenCaption(null); }
     document.body.classList.toggle('tokon', ex > 0.45);
 
@@ -984,7 +1097,7 @@ function animate() {
       const slot = tokenSlot(i, n);
       const x = slot.x;
       const y = slot.y + tk.h * 0.05;
-      const z = slot.z + tk.h * 0.62;
+      const z = slot.z + tk.h * 0.4;
       tk.g.position.x = damp(tk.g.position.x, x, 6, dt);
       tk.g.position.y = damp(tk.g.position.y, THREE.MathUtils.lerp(-2.9, y, ease), 6, dt);
       tk.g.position.z = damp(tk.g.position.z, THREE.MathUtils.lerp(1.7, z, ease), 6, dt);

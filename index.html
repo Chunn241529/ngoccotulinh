@@ -180,11 +180,30 @@
   .hud{opacity:0}
 
   @media (max-width:900px){
-    #hero{align-items:flex-start;padding:0 22px;padding-top:16vh}
+    /* màn đầu trên điện thoại: chỉ chữ, bài trồi lên khi cuộn/bấm nút */
+    #hero{align-items:center;padding:0 22px}
     .hero-in{width:100%}
-    .hero-in h1{font-size:clamp(44px,12vw,64px)}
-    .hero-in .lede{font-size:15px}
+    .hero-in h1{font-size:clamp(40px,11.5vw,58px)}
+    .hero-in .lede{font-size:14.5px;margin-top:18px}
+    #cta{margin-top:24px}
+    .hero-in .meta{margin-top:16px}
     .scroll-cue{left:22px;bottom:22px}
+  }
+  /* điện thoại nằm ngang: bề ngang rộng nhưng chỉ ~390px cao, phải nén phần chữ */
+  @media (max-width:900px) and (orientation:landscape){
+    #hero{padding-top:5vh}
+    .hero-in{width:min(46vw,420px)}
+    .hero-in h1{font-size:clamp(28px,7.2vh,44px)}
+    .hero-in .lede{font-size:13px;line-height:1.5;margin-top:12px;max-width:64ch}
+    #cta{margin-top:14px;padding:10px 16px;font-size:10px}
+    .hero-in .meta{display:none}
+    .scroll-cue{display:none}
+    .brand{top:14px;left:18px}
+    .brand img{height:32px}
+    #info{bottom:46px}
+    #info h2{font-size:24px}
+    .hint{bottom:14px}
+    .counter{bottom:14px}
   }
 
   /* ---------- loading ---------- */
@@ -256,7 +275,7 @@
 <div id="tok">
   <div class="kicker">Token đánh dấu <b id="tok-count">05</b></div>
   <h3 id="tok-name">Token đánh dấu</h3>
-  <p id="tok-rule">Đưa chuột lên một token để đọc công dụng.</p>
+  <p id="tok-rule">Chọn một token để đọc công dụng.</p>
   <div class="bar"></div>
 </div>
 
