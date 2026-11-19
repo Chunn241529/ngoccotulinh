@@ -1,0 +1,82 @@
+{
+  "1": {
+    "title": "Sửa",
+    "note": "Cộng 1 điểm cho Nhiệm vụ.",
+    "back": "item"
+  },
+  "2": {
+    "title": "Hiến Tế",
+    "note": "Cộng 2 điểm. Mỗi người chỉ dùng được một lần.",
+    "back": "item"
+  },
+  "3": {
+    "title": "Sửa",
+    "note": "Cộng 1 điểm cho Nhiệm vụ.",
+    "back": "item"
+  },
+  "4": {
+    "title": "Phá",
+    "note": "Trừ 2 điểm của Nhiệm vụ.",
+    "back": "item"
+  },
+  "5": {
+    "title": "Lệch Long Mạch",
+    "note": "Kiếp Nạn: đội 3 người, cần 4 điểm.",
+    "back": "nhiệm vụ"
+  },
+  "6": {
+    "title": "Nhiệm Vụ",
+    "note": "Kiếp Nạn: đội 3 người, cần 5 điểm.",
+    "back": "nhiệm vụ"
+  },
+  "7": {
+    "title": "Đứt Chỉ Giới",
+    "note": "Kiếp Nạn: đội 5 người, cần 5 điểm.",
+    "back": "nhiệm vụ"
+  },
+  "8": {
+    "title": "Nhiệm Vụ",
+    "note": "Kiếp Nạn: đội 4 người, cần 5 điểm.",
+    "back": "nhiệm vụ"
+  },
+  "9": {
+    "title": "Duyệt",
+    "note": "Phiếu chấp thuận đội được đề xuất.",
+    "back": "biểu quyết"
+  },
+  "10": {
+    "title": "Bác",
+    "note": "Phiếu phản đối đội được đề xuất.",
+    "back": "biểu quyết"
+  },
+  "rồng": {
+    "title": "Rồng",
+    "note": "Long Nhãn · Buộc một người nộp bài riêng để lộ danh tính lá đã đánh.",
+    "back": "nhân vật"
+  },
+  "phượng": {
+    "title": "Phượng",
+    "note": "Phượng Dục · Gỡ Cách ly, đặt Miễn trừ, đưa người đó vào đội ngay.",
+    "back": "nhân vật"
+  },
+  "rùa": {
+    "title": "Rùa",
+    "note": "Quy Giáp · Một người không thể bị Cách ly ở cuối vòng này.",
+    "back": "nhân vật"
+  },
+  "lân": {
+    "title": "Lân",
+    "note": "Lân Chỉ · Ép một người vào đội đề xuất, Đội trưởng phải thay người khác ra.",
+    "back": "nhân vật"
+  },
+  "ác linh": {
+    "title": "Oán Linh",
+    "note": "Không có thẻ Nghề, không kỹ năng. Thắng khi Nhiệm vụ thất bại.",
+    "back": "nhân vật"
+  },
+  "canh gác": {
+    "title": "Canh Gác",
+    "note": "Trấn Môn · Buộc một người lật một lá chưa đánh, thu hẹp lá đã nộp.",
+    "back": "nhân vật"
+  }
+}

@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ngọc Cổ Tứ Linh · Trò chơi suy luận</title>
+<style>
+  @font-face{
+    font-family:'DFVN';
+    src:url('assets/cards/DFVN%20GLD%20Display%20Black.otf') format('opentype'),
+        url('assets/cards/DFVN%20GLD%20Display%20Black.ttf') format('truetype');
+    font-display:block;
+  }
+  :root{
+    --ink:#0a0706;
+    --bone:#f7efdf;
+    --muted:#a4938a;
+    --line:rgba(255,255,255,.14);
+    --gold:#f6b347;
+    --jade:#50bd8f;
+    --red:#801a18;
+    --serif:'Palatino Linotype',Palatino,Georgia,'Times New Roman',serif;
+    --display:'DFVN','Palatino Linotype',Georgia,serif;
+    --mono:'Segoe UI Mono','Cascadia Mono',Consolas,ui-monospace,monospace;
+    --panel-w:min(30vw,360px);
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  html,body{height:100%}
+  body{
+    margin:0;background:var(--ink);color:var(--bone);
+    font-family:var(--serif);
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+    height:300vh;              /* 1 giới thiệu · 2 bộ bài · 3 token */
+  }
+  #app{position:fixed;inset:0}
+  canvas{display:block}
+
+  /* ---------- HUD ---------- */
+  .hud{position:fixed;inset:0;pointer-events:none;z-index:3}
+  .hud > *{pointer-events:none}
+
+  .brand{position:absolute;top:30px;left:40px;display:flex;flex-direction:column;gap:9px}
+  .brand img{height:44px;width:auto;display:block;filter:drop-shadow(0 2px 12px rgba(128,26,24,.5))}
+  .brand img[data-missing]{display:none}
+  .brand:has(img:not([data-missing])) .mark{display:none}
+  .brand .mark{
+    font-family:var(--display);font-size:26px;line-height:1;
+    letter-spacing:.16em;color:var(--bone);text-transform:uppercase;
+  }
+  .brand .rule{width:58px;height:1px;background:linear-gradient(90deg,var(--gold),transparent)}
+  .brand .sub{
+    font-family:var(--mono);font-size:10px;letter-spacing:.28em;
+    color:var(--muted);text-transform:uppercase;
+  }
+
+  .hint{
+    position:absolute;left:50%;bottom:26px;transform:translateX(-50%);
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;
+    color:rgba(239,232,218,.42);text-transform:uppercase;white-space:nowrap;
+    display:flex;gap:18px;align-items:center;
+  }
+  .hint b{color:rgba(239,232,218,.72);font-weight:500}
+  .hint i{width:3px;height:3px;border-radius:50%;background:rgba(239,232,218,.25)}
+
+  .counter{
+    position:absolute;right:40px;bottom:26px;
+    font-family:var(--mono);font-size:11px;letter-spacing:.25em;color:rgba(239,232,218,.5);
+  }
+
+  /* ---------- detail view ---------- */
+  #scrim{
+    position:fixed;inset:0;z-index:1;pointer-events:none;opacity:0;transition:opacity .55s ease;
+    background:
+      radial-gradient(120% 95% at 32% 50%, transparent 32%, rgba(5,5,10,.5) 72%, rgba(5,5,10,.88) 100%),
+      linear-gradient(90deg, transparent 44%, rgba(5,5,10,.84) 64%, rgba(5,5,10,.97) 100%);
+  }
+  body.focused #scrim{opacity:1}
+
+  #info{
+    position:absolute;right:44px;top:78px;bottom:86px;width:var(--panel-w);
+    display:flex;flex-direction:column;justify-content:center;
+    opacity:0;visibility:hidden;transform:translateX(18px);
+    transition:opacity .4s ease,transform .6s cubic-bezier(.2,.8,.2,1),visibility .4s;
+    pointer-events:none;
+  }
+  #info.on{opacity:1;visibility:visible;transform:translateX(0)}
+  #info .idx{
+    position:absolute;top:0;left:0;font-family:var(--mono);font-size:11px;
+    letter-spacing:.3em;color:rgba(242,236,224,.42);
+  }
+  #info .idx b{color:var(--bone);font-weight:500}
+  #info .kind{
+    display:inline-flex;align-items:center;gap:8px;align-self:flex-start;
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.26em;
+    text-transform:uppercase;padding:7px 13px;border-radius:999px;
+    border:1px solid rgba(246,179,71,.5);color:var(--gold);
+  }
+  #info .kind::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--gold)}
+  #info .kind[data-type="feature"]{border-color:rgba(80,189,143,.5);color:var(--jade)}
+  #info .kind[data-type="feature"]::before{background:var(--jade)}
+  #info h2{
+    font-family:var(--display);font-weight:400;font-size:clamp(32px,3.4vw,50px);
+    line-height:1.1;margin:18px 0 0;letter-spacing:.005em;color:#fff;
+    overflow-wrap:break-word;
+  }
+  #info .sub{
+    display:block;margin-top:12px;font-family:var(--mono);font-size:11px;
+    letter-spacing:.24em;text-transform:uppercase;color:var(--muted);
+  }
+  #info .rule{height:1px;margin:22px 0 0;background:linear-gradient(90deg,rgba(242,236,224,.3),transparent)}
+  #info p{
+    margin:20px 0 0;font-size:16px;line-height:1.66;color:rgba(242,236,224,.78);
+    max-width:34ch;
+  }
+  #info p:empty{display:none}
+  #info .note{display:none;margin-top:24px;padding-left:14px;border-left:1px solid rgba(246,179,71,.45)}
+  #info .note.on{display:block}
+  #info .note .label{
+    display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.3em;
+    text-transform:uppercase;color:rgba(246,179,71,.85);margin-bottom:7px;
+  }
+  #info .note-body{font-size:15px;line-height:1.6;color:rgba(247,239,223,.92)}
+  #info .tags:empty{display:none}
+  #info .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+  #info .tags span{
+    font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+    padding:6px 10px;border-radius:2px;color:rgba(242,236,224,.72);
+    background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);
+  }
+  #info .keys{
+    position:absolute;bottom:0;left:0;font-family:var(--mono);font-size:9.5px;
+    letter-spacing:.2em;text-transform:uppercase;color:rgba(242,236,224,.35);
+  }
+
+
+  /* ---------- hero / intro ---------- */
+  #hero{
+    position:fixed;inset:0;z-index:2;display:flex;align-items:center;
+    padding-left:6.2vw;pointer-events:none;will-change:transform,opacity;
+  }
+  .hero-in{width:min(44vw,560px)}
+  .hero-in .eyebrow{
+    margin:0 0 22px;font-family:var(--mono);font-size:10.5px;letter-spacing:.34em;
+    text-transform:uppercase;color:rgba(246,179,71,.85);
+    display:flex;align-items:center;gap:12px;
+  }
+  .hero-in .eyebrow::before{content:'';width:34px;height:1px;background:rgba(246,179,71,.7)}
+  .hero-in h1{
+    margin:0;font-family:var(--display);font-weight:400;
+    font-size:clamp(52px,6.4vw,92px);line-height:.98;letter-spacing:.01em;color:#fff;
+  }
+  .hero-in .lede{
+    margin:24px 0 0;font-size:16.5px;line-height:1.62;color:rgba(247,239,223,.72);
+    max-width:40ch;
+  }
+  #cta{
+    margin-top:34px;pointer-events:auto;cursor:pointer;
+    display:inline-flex;align-items:center;gap:14px;
+    font-family:var(--mono);font-size:11px;letter-spacing:.26em;text-transform:uppercase;
+    color:#14100e;background:var(--gold);border:0;border-radius:2px;
+    padding:15px 24px;transition:transform .25s ease, box-shadow .35s ease, background .25s;
+    box-shadow:0 10px 34px rgba(246,179,71,.22);
+  }
+  #cta span{font-size:14px;line-height:1;transform:translateY(-1px)}
+  #cta:hover{transform:translateY(-2px);box-shadow:0 16px 44px rgba(246,179,71,.34)}
+  #cta:active{transform:translateY(0)}
+  #cta:focus-visible{outline:2px solid var(--bone);outline-offset:3px}
+  .hero-in .meta{
+    margin:22px 0 0;font-family:var(--mono);font-size:10px;letter-spacing:.2em;
+    text-transform:uppercase;color:rgba(247,239,223,.42);
+  }
+  .scroll-cue{
+    position:absolute;left:6.2vw;bottom:34px;display:flex;align-items:center;gap:10px;
+    font-family:var(--mono);font-size:9.5px;letter-spacing:.28em;text-transform:uppercase;
+    color:rgba(247,239,223,.35);
+  }
+  .scroll-cue i{display:block;width:1px;height:34px;background:linear-gradient(180deg,rgba(247,239,223,.45),transparent);animation:cue 2.4s ease-in-out infinite}
+  @keyframes cue{0%,100%{opacity:.25;transform:scaleY(.6)}50%{opacity:.9;transform:scaleY(1)}}
+  .hud{opacity:0}
+
+  @media (max-width:900px){
+    #hero{align-items:flex-start;padding:0 22px;padding-top:16vh}
+    .hero-in{width:100%}
+    .hero-in h1{font-size:clamp(44px,12vw,64px)}
+    .hero-in .lede{font-size:15px}
+    .scroll-cue{left:22px;bottom:22px}
+  }
+
+  /* ---------- loading ---------- */
+  #loading{
+    position:fixed;inset:0;z-index:9;display:grid;place-items:center;
+    background:var(--ink);transition:opacity .8s ease,visibility .8s;
+  }
+  #loading.gone{opacity:0;visibility:hidden}
+  #loading .t{
+    font-family:var(--mono);font-size:10px;letter-spacing:.42em;text-transform:uppercase;
+    color:rgba(239,232,218,.55);animation:pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes pulse{0%,100%{opacity:.35}50%{opacity:.9}}
+
+  body.focused .hint{opacity:0}
+
+  /* ---------- token caption ---------- */
+  #tok{
+    position:fixed;left:50%;bottom:34px;width:min(620px,86vw);
+    transform:translate(-50%,16px);text-align:center;z-index:4;
+    opacity:0;visibility:hidden;pointer-events:none;
+    transition:opacity .45s ease,transform .65s cubic-bezier(.2,.8,.2,1),visibility .4s;
+  }
+  body.tokon #tok{opacity:1;visibility:visible;transform:translate(-50%,0)}
+  body.tokon .hint,body.tokon .counter{opacity:0}
+  #tok .kicker{
+    font-family:var(--mono);font-size:10px;letter-spacing:.34em;text-transform:uppercase;
+    color:rgba(239,232,218,.42);display:flex;gap:10px;justify-content:center;align-items:center;
+  }
+  #tok .kicker b{color:var(--gold);font-weight:400}
+  #tok h3{
+    font-family:var(--display);font-size:clamp(26px,3.1vw,40px);line-height:1.05;
+    margin:10px 0 10px;letter-spacing:.01em;color:var(--bone);
+  }
+  #tok p{
+    margin:0 auto;max-width:52ch;font-size:14.5px;line-height:1.62;
+    color:rgba(242,236,224,.62);transition:color .3s ease;
+  }
+  #tok.sel p{color:rgba(242,236,224,.82)}
+  #tok .bar{
+    width:44px;height:1px;margin:16px auto 0;
+    background:linear-gradient(90deg,transparent,rgba(246,179,71,.8),transparent);
+    transition:width .5s ease;
+  }
+  #tok.sel .bar{width:96px}
+
+  @media (max-width:900px){
+    .brand{top:22px;left:22px}
+    .brand .mark{font-size:20px}
+    .hint{font-size:9.5px;gap:11px;bottom:20px}
+    .hint .kbd{display:none}
+    .counter{right:22px;bottom:20px}
+    #info{right:20px;left:20px;width:auto;top:auto;bottom:58px;justify-content:flex-end;transform:translateY(14px)}
+    #info.on{transform:translateY(0)}
+    #info .idx,#info .keys,#info p,#info .rule{display:none}
+    #info h2{font-size:30px;margin-top:12px}
+    #info .tags{margin-top:12px}
+    #scrim{background:linear-gradient(180deg,transparent 34%,rgba(5,5,10,.92) 84%)}
+  }
+  @media (prefers-reduced-motion:reduce){
+    #loading .t{animation:none}
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="scrim"></div>
+
+<div id="tok">
+  <div class="kicker">Token đánh dấu <b id="tok-count">05</b></div>
+  <h3 id="tok-name">Token đánh dấu</h3>
+  <p id="tok-rule">Đưa chuột lên một token để đọc công dụng.</p>
+  <div class="bar"></div>
+</div>
+
+<section id="hero">
+  <div class="hero-in">
+    <p class="eyebrow">Trò chơi suy luận · 7 người + quản trò</p>
+    <h1>Ngọc Cổ<br>Tứ Linh</h1>
+    <p class="lede">Đàn Tứ Linh giữ Ấn Phong qua năm Kiếp Nạn. Trong bảy người, Oán Linh đã nhập vào hai. Cứ ba Nhiệm vụ thành công thì Hộ Đàn thắng; Ấn vỡ là Oán Linh thắng.</p>
+    <button id="cta" type="button">Xem bộ bài <span>→</span></button>
+    <p class="meta">5 Hộ Đàn · 2 Oán Linh · 5 Kiếp Nạn</p>
+  </div>
+  <div class="scroll-cue">Cuộn <i></i></div>
+</section>
+
+<div class="hud">
+  <div class="brand">
+    <img src="assets/cards/logo1.png" alt="" onerror="this.dataset.missing=1">
+    <div class="mark">Arca</div>
+    <div class="rule"></div>
+    <div class="sub">Trò chơi suy luận xã hội</div>
+  </div>
+
+  <div id="info">
+    <span class="idx"><b id="idx-now">01</b> <span id="idx-all">/ 08</span></span>
+    <span class="kind">Lá Role</span>
+    <h2></h2>
+    <span class="sub"></span>
+    <div class="rule"></div>
+    <p></p>
+    <div class="note"><span class="label">Ghi chú</span><div class="note-body"></div></div>
+    <div class="tags"></div>
+    <span class="keys">Space lật · ← → đổi lá · Esc thoát</span>
+  </div>
+
+  <div class="hint">
+    <span class="kbd"><b>Di chuột</b> đổi góc nhìn</span><i class="kbd"></i>
+    <span><b>Chạm</b> để soi lá</span><i class="kbd"></i>
+    <span class="kbd"><b>← →</b> đổi lá</span><i class="kbd"></i>
+    <span class="kbd"><b>Space</b> lật</span>
+  </div>
+  <div class="counter" id="counter">01 / 08</div>
+</div>
+
+<div id="loading"><div class="t">Đang dựng bàn…</div></div>
+
+<script src="vendor/bundle.js"></script>
+</body>
+</html>

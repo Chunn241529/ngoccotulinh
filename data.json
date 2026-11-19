@@ -1,0 +1,292 @@
+{
+ "cards": [
+  {
+   "name": "bàn trung tâm",
+   "file": "assets/cards/b%C3%A0n%20trung%20t%C3%A2m.png",
+   "group": ""
+  },
+  {
+   "name": "logo",
+   "file": "assets/cards/logo.png",
+   "group": ""
+  },
+  {
+   "name": "logo1",
+   "file": "assets/cards/logo1.png",
+   "group": ""
+  },
+  {
+   "name": "màu",
+   "file": "assets/cards/m%C3%A0u.png",
+   "group": ""
+  },
+  {
+   "name": "ác linh",
+   "file": "assets/cards/th%E1%BA%BB%20nv/%C3%A1c%20linh.png",
+   "group": "thẻ nv",
+   "title": "Oán Linh",
+   "note": "Không có thẻ Nghề, không kỹ năng. Thắng khi Nhiệm vụ thất bại.",
+   "back": "nhân vật"
+  },
+  {
+   "name": "canh gác",
+   "file": "assets/cards/th%E1%BA%BB%20nv/canh%20g%C3%A1c.png",
+   "group": "thẻ nv",
+   "title": "Canh Gác",
+   "note": "Trấn Môn · Buộc một người lật một lá chưa đánh, thu hẹp lá đã nộp.",
+   "back": "nhân vật"
+  },
+  {
+   "name": "lân",
+   "file": "assets/cards/th%E1%BA%BB%20nv/l%C3%A2n.png",
+   "group": "thẻ nv",
+   "title": "Lân",
+   "note": "Lân Chỉ · Ép một người vào đội đề xuất, Đội trưởng phải thay người khác ra.",
+   "back": "nhân vật"
+  },
+  {
+   "name": "phượng",
+   "file": "assets/cards/th%E1%BA%BB%20nv/ph%C6%B0%E1%BB%A3ng.png",
+   "group": "thẻ nv",
+   "title": "Phượng",
+   "note": "Phượng Dục · Gỡ Cách ly, đặt Miễn trừ, đưa người đó vào đội ngay.",
+   "back": "nhân vật"
+  },
+  {
+   "name": "rồng",
+   "file": "assets/cards/th%E1%BA%BB%20nv/r%E1%BB%93ng.png",
+   "group": "thẻ nv",
+   "title": "Rồng",
+   "note": "Long Nhãn · Buộc một người nộp bài riêng để lộ danh tính lá đã đánh.",
+   "back": "nhân vật"
+  },
+  {
+   "name": "rùa",
+   "file": "assets/cards/th%E1%BA%BB%20nv/r%C3%B9a.png",
+   "group": "thẻ nv",
+   "title": "Rùa",
+   "note": "Quy Giáp · Một người không thể bị Cách ly ở cuối vòng này.",
+   "back": "nhân vật"
+  },
+  {
+   "name": "1",
+   "file": "assets/cards/th%E1%BA%BB%20o%C3%A1nh%20nhau%20z%E1%BB%9Bi%20th%E1%BA%BB%20nv/1.png",
+   "group": "thẻ oánh nhau zới thẻ nv",
+   "title": "Sửa",
+   "note": "Cộng 1 điểm cho Nhiệm vụ.",
+   "back": "item"
+  },
+  {
+   "name": "2",
+   "file": "assets/cards/th%E1%BA%BB%20o%C3%A1nh%20nhau%20z%E1%BB%9Bi%20th%E1%BA%BB%20nv/2.png",
+   "group": "thẻ oánh nhau zới thẻ nv",
+   "title": "Hiến Tế",
+   "note": "Cộng 2 điểm. Mỗi người chỉ dùng được một lần.",
+   "back": "item"
+  },
+  {
+   "name": "3",
+   "file": "assets/cards/th%E1%BA%BB%20o%C3%A1nh%20nhau%20z%E1%BB%9Bi%20th%E1%BA%BB%20nv/3.png",
+   "group": "thẻ oánh nhau zới thẻ nv",
+   "title": "Sửa",
+   "note": "Cộng 1 điểm cho Nhiệm vụ.",
+   "back": "item"
+  },
+  {
+   "name": "4",
+   "file": "assets/cards/th%E1%BA%BB%20o%C3%A1nh%20nhau%20z%E1%BB%9Bi%20th%E1%BA%BB%20nv/4.png",
+   "group": "thẻ oánh nhau zới thẻ nv",
+   "title": "Phá",
+   "note": "Trừ 2 điểm của Nhiệm vụ.",
+   "back": "item"
+  },
+  {
+   "name": "5",
+   "file": "assets/cards/th%E1%BA%BB%20o%C3%A1nh%20nhau%20z%E1%BB%9Bi%20th%E1%BA%BB%20nv/5.png",
+   "group": "thẻ oánh nhau zới thẻ nv",
+   "title": "Lệch Long Mạch",
+   "note": "Kiếp Nạn: đội 3 người, cần 4 điểm.",
+   "back": "nhiệm vụ"
+  },
+  {
+   "name": "6",
+   "file": "assets/cards/th%E1%BA%BB%20o%C3%A1nh%20nhau%20z%E1%BB%9Bi%20th%E1%BA%BB%20nv/6.png",
+   "group": "thẻ oánh nhau zới thẻ nv",
+   "title": "Nhiệm Vụ",
+   "note": "Kiếp Nạn: đội 3 người, cần 5 điểm.",
+   "back": "nhiệm vụ"
+  },
+  {
+   "name": "7",
+   "file": "assets/cards/th%E1%BA%BB%20o%C3%A1nh%20nhau%20z%E1%BB%9Bi%20th%E1%BA%BB%20nv/7.png",
+   "group": "thẻ oánh nhau zới thẻ nv",
+   "title": "Đứt Chỉ Giới",
+   "note": "Kiếp Nạn: đội 5 người, cần 5 điểm.",
+   "back": "nhiệm vụ"
+  },
+  {
+   "name": "8",
+   "file": "assets/cards/th%E1%BA%BB%20o%C3%A1nh%20nhau%20z%E1%BB%9Bi%20th%E1%BA%BB%20nv/8.png",
+   "group": "thẻ oánh nhau zới thẻ nv",
+   "title": "Nhiệm Vụ",
+   "note": "Kiếp Nạn: đội 4 người, cần 5 điểm.",
+   "back": "nhiệm vụ"
+  },
+  {
+   "name": "9",
+   "file": "assets/cards/th%E1%BA%BB%20o%C3%A1nh%20nhau%20z%E1%BB%9Bi%20th%E1%BA%BB%20nv/9.png",
+   "group": "thẻ oánh nhau zới thẻ nv",
+   "title": "Duyệt",
+   "note": "Phiếu chấp thuận đội được đề xuất.",
+   "back": "biểu quyết"
+  },
+  {
+   "name": "10",
+   "file": "assets/cards/th%E1%BA%BB%20o%C3%A1nh%20nhau%20z%E1%BB%9Bi%20th%E1%BA%BB%20nv/10.png",
+   "group": "thẻ oánh nhau zới thẻ nv",
+   "title": "Bác",
+   "note": "Phiếu phản đối đội được đề xuất.",
+   "back": "biểu quyết"
+  },
+  {
+   "name": "ngọc cổ",
+   "file": "assets/cards/token/ng%E1%BB%8Dc%20c%E1%BB%95.png",
+   "group": "token"
+  },
+  {
+   "name": "token1",
+   "file": "assets/cards/token/token1.png",
+   "group": "token"
+  },
+  {
+   "name": "token2",
+   "file": "assets/cards/token/token2.png",
+   "group": "token"
+  },
+  {
+   "name": "token3",
+   "file": "assets/cards/token/token3.png",
+   "group": "token"
+  },
+  {
+   "name": "token4",
+   "file": "assets/cards/token/token4.png",
+   "group": "token"
+  },
+  {
+   "name": "token5",
+   "file": "assets/cards/token/token5.png",
+   "group": "token"
+  }
+ ],
+ "extras": {
+  "backs": [
+   {
+    "name": "thẻ biểu quyết",
+    "file": "assets/m%E1%BA%B7t%20sau%20c%E1%BB%A7a%20th%E1%BA%BB/th%E1%BA%BB%20bi%E1%BB%83u%20quy%E1%BA%BFt.png"
+   },
+   {
+    "name": "thẻ item",
+    "file": "assets/m%E1%BA%B7t%20sau%20c%E1%BB%A7a%20th%E1%BA%BB/th%E1%BA%BB%20item.png"
+   },
+   {
+    "name": "thẻ nhân vật",
+    "file": "assets/m%E1%BA%B7t%20sau%20c%E1%BB%A7a%20th%E1%BA%BB/th%E1%BA%BB%20nh%C3%A2n%20v%E1%BA%ADt.png"
+   },
+   {
+    "name": "thẻ nhiệm vụ",
+    "file": "assets/m%E1%BA%B7t%20sau%20c%E1%BB%A7a%20th%E1%BA%BB/th%E1%BA%BB%20nhi%E1%BB%87m%20v%E1%BB%A5.png"
+   }
+  ],
+  "clouds": [
+   {
+    "name": "mây1",
+    "file": "assets/m%C3%A2y/m%C3%A2y1.png"
+   },
+   {
+    "name": "mây2",
+    "file": "assets/m%C3%A2y/m%C3%A2y2.png"
+   },
+   {
+    "name": "mây3",
+    "file": "assets/m%C3%A2y/m%C3%A2y3.png"
+   },
+   {
+    "name": "mây4",
+    "file": "assets/m%C3%A2y/m%C3%A2y4.png"
+   },
+   {
+    "name": "mây5",
+    "file": "assets/m%C3%A2y/m%C3%A2y5.png"
+   },
+   {
+    "name": "mây6",
+    "file": "assets/m%C3%A2y/m%C3%A2y6.png"
+   },
+   {
+    "name": "mây7",
+    "file": "assets/m%C3%A2y/m%C3%A2y7.png"
+   },
+   {
+    "name": "mây8",
+    "file": "assets/m%C3%A2y/m%C3%A2y8.png"
+   },
+   {
+    "name": "mây9",
+    "file": "assets/m%C3%A2y/m%C3%A2y9.png"
+   }
+  ],
+  "tokens": [
+   {
+    "name": "ngọc cổ",
+    "file": "assets/cards/token/ng%E1%BB%8Dc%20c%E1%BB%95.png"
+   },
+   {
+    "name": "token1",
+    "file": "assets/cards/token/token1.png"
+   },
+   {
+    "name": "token2",
+    "file": "assets/cards/token/token2.png"
+   },
+   {
+    "name": "token3",
+    "file": "assets/cards/token/token3.png"
+   },
+   {
+    "name": "token4",
+    "file": "assets/cards/token/token4.png"
+   },
+   {
+    "name": "token5",
+    "file": "assets/cards/token/token5.png"
+   }
+  ],
+  "tokenInfo": {
+   "token1": {
+    "name": "Giáp",
+    "rule": "Bảo hộ: người mang token không thể bị Cách ly ở cuối vòng này."
+   },
+   "token2": {
+    "name": "Linh Phù",
+    "rule": "Đốt để cộng 2 điểm cho Nhiệm vụ. Cả ván chỉ có hai Linh Phù."
+   },
+   "token3": {
+    "name": "Nhãn",
+    "rule": "Kiểm toán của Long: buộc một người nộp bài riêng để lộ lá đã đánh."
+   },
+   "token4": {
+    "name": "Miễn trừ",
+    "rule": "Không thể bị Cách ly ở cuối vòng này. Đặt lên khi được Phượng giải Cách ly."
+   },
+   "token5": {
+    "name": "Cách ly",
+    "rule": "Người mang token không được vào đội ở nhiệm vụ kế tiếp."
+   },
+   "ngọc cổ": {
+    "name": "Ngọc Cổ",
+    "rule": "Ấn Phong. Ba Nhiệm vụ thành công thì Hộ Đàn giữ được Ấn."
+   }
+  }
+ }
+}
