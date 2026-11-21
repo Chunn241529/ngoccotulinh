@@ -3,3 +3,4 @@ preview*.png
 _data*.png
 _*.png
 .DS_Store
+_backup/
